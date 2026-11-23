@@ -6,16 +6,16 @@ services:
     restart: unless-stopped
     environment:
       - PORT=${PORT:-3000}
-      - DATA_DIR=/data
+      - DATA_DIR=/app/data
       - TRUST_PROXY=${TRUST_PROXY:-1}
       - RP_ID=${RP_ID}
       - ORIGIN=${ORIGIN}
-      - FIRST_USER_ADMIN=${FIRST_USER_ADMIN:-1}
+      - ALLOWED_PRIVATE_IPS=${ALLOWED_PRIVATE_IPS}
       - INVITE_ONLY=${INVITE_ONLY:-0}
       - ALLOW_GUEST=${ALLOW_GUEST:-1}
     volumes:
-      - ./data:/data
-      - ./coach-auth:/coach-auth
+      - opengym_data:/app/data
+      - opengym_coach:/app/coach-auth
 
   web:
     image: ghcr.io/duartesantos8/opengym-web:latest
@@ -35,3 +35,7 @@ services:
       - MEDIA_UPLOAD_MAX=${MEDIA_UPLOAD_MAX:-112m}
       - MCP_BACKEND=${MCP_BACKEND:-mcp}
       - MCP_PORT=${MCP_PORT:-3100}
+
+volumes:
+  opengym_data:
+  opengym_coach:
