@@ -3,7 +3,8 @@
 // The numbers come from lib/report.js; the page shell, the page-break rules and the printing from
 // lib/print-doc.js. Charts are inline SVG drawn here, so they stay sharp at any zoom and print the
 // same on every platform. No exercise media is ever put on paper.
-import { EXIDX } from './exercises.js'
+import { EXIDX, isCustomEx } from './exercises.js'
+import { MEDIA_CREDIT, isPrintPicture, loadPicturesForIds } from './print-pictures.js'
 import { setLabel, sessionSections, workoutVolume, sessionVolume, countsWarmups, workoutDuration, workoutDay } from './history.js'
 import { isWarmupRow, hasCompletedWork } from './workout-model.js'
 import { fmtNum, fmtVol, fmtDur, fmtDate, todayISO, DAYS, weekOrder, weekDayOffset } from './format.js'
@@ -20,14 +21,17 @@ import { isoRun } from './bidi.js'
 
 const nameParts = e => printedName(EXIDX[e.id], e.n || e.muscleSnapshot?.n || e.id)
 
-function nameHTML(e, { pr = false, short = false } = {}) {
+function nameHTML(e, { pr = false, short = false, pictures = null } = {}) {
   const ex = EXIDX[e.id]
   const { name, en, cls } = nameParts(e)
   const part = ex && ex.bp && ex.bp !== 'cardio' ? ` <span class="part">${esc(t(ex.bp))}</span>` : ''
   // `short`: a row in a long list, where the English line and the spelled-out badge cost a line each.
   const badge = pr ? ` <span class="pr">${short ? 'PR' : esc(t('New best'))}</span>` : ''
-  return `<div class="ex-n ${cls}">${esc(name)}${part}${badge}</div>`
+  const pic = pictures && e?.id && isPrintPicture(pictures[e.id]) ? pictures[e.id] : null
+  const text = `<div class="ex-n ${cls}">${esc(name)}${part}${badge}</div>`
     + (en && !short ? `<div class="ex-en">${esc(en)}</div>` : '')
+  if (!pic) return text
+  return `<div class="ex-pic-row"><img class="ex-pic${short ? ' sm' : ''}" src="${esc(pic)}" alt="" /><div>${text}</div></div>`
 }
 
 // Short day + date for lists: "Thu 15 Oct".
@@ -217,6 +221,9 @@ const REPORT_CSS = `
   .hbar.top { background: #4d7c0f; }
 
   .ex-n { font-weight: 600; overflow-wrap: anywhere; }
+  .ex-pic-row { display: flex; align-items: center; gap: 6pt; }
+  .ex-pic { flex: none; width: 24pt; height: 24pt; border-radius: 4pt; object-fit: cover; background: #f3f4f6; border: 1px solid var(--rule-soft); }
+  .ex-pic.sm { width: 20pt; height: 20pt; border-radius: 3pt; }
   .ex-n.capitalize { text-transform: capitalize; }
   .ex-n .part { display: inline-block; text-transform: none; color: var(--faint); font-weight: 400; font-size: 8pt; margin-inline-start: 2pt; }
   .ex-n .part::first-letter { text-transform: uppercase; }
@@ -297,7 +304,13 @@ function entryVolume(e, S) { return workoutVolume({ entries: [e] }, { warmups: c
  * One finished workout on paper: what it was, when, how long and how heavy, then every exercise
  * with every set. Each exercise, and each superset, stays whole on a page.
  */
-export function workoutPrintHTML(S, w, { owner = '', probe = false } = {}) {
+function usedPictureCredit(ids, pictures) {
+  if (!pictures || typeof pictures !== 'object') return ''
+  const hasCatalogue = ids.some(id => isPrintPicture(pictures[id]) && EXIDX[id] && !isCustomEx(EXIDX[id]))
+  return hasCatalogue ? MEDIA_CREDIT : ''
+}
+
+export function workoutPrintHTML(S, w, { owner = '', probe = false, pictures = null } = {}) {
   const m = probeMarks(probe)
   const unit = S.unit || 'kg'
   const speedUnit = speedUnitOf(S)
@@ -319,7 +332,7 @@ export function workoutPrintHTML(S, w, { owner = '', probe = false } = {}) {
     const v = entryVolume(e, S)
     const done = (e.sets || []).filter(s => !isWarmupRow(s) && hasCompletedWork(s)).length
     const sum = [t('{0} sets', done), v > 0 ? fmtVol(v, unit) : ''].filter(Boolean).join(' · ')
-    return `<div class="wx"><div class="wx-h"><div class="wx-num">${++num}</div><div class="wx-main">${nameHTML(e, { pr: prs.has(e.id) })}</div><div class="wx-sum">${esc(sum)}</div></div>`
+    return `<div class="wx"><div class="wx-h"><div class="wx-num">${++num}</div><div class="wx-main">${nameHTML(e, { pr: prs.has(e.id), pictures })}</div><div class="wx-sum">${esc(sum)}</div></div>`
       + setsHTML(viewEntry(S, e), speedUnit, exUnitTag(S, e.id))
       + (e.note ? `<div class="wx-note">${esc(e.note)}</div>` : '') + '</div>'
   }
@@ -333,7 +346,8 @@ export function workoutPrintHTML(S, w, { owner = '', probe = false } = {}) {
   const facts = [day ? paperDate(day) : '', [clock(w.start), clock(w.end)].filter(Boolean).join(' – ')]
   const body = `<div class="keep">${m.s('cards')}<div class="cards">${cards.join('')}</div>${m.e('cards')}</div>`
     + (blocks || `<p class="none">${esc(t('no sets'))}</p>`) + note
-  return printShell({ title: w.name || t('Workout'), kicker: t('Workout'), facts, owner, date: todayISO(), body, css: REPORT_CSS })
+  const credit = usedPictureCredit((w.entries || []).map(e => e.id), pictures)
+  return printShell({ title: w.name || t('Workout'), kicker: t('Workout'), facts, owner, date: todayISO(), body, css: REPORT_CSS, credit })
 }
 
 /* ---------------------------- the performance report ---------------------------- */
@@ -428,7 +442,7 @@ function musclesHTML(R, m) {
   return `<table class="mus">${headRow(t('Sets per muscle'), 3, 'mus0', m)}<tbody>${rows}</tbody></table>${missed}<div class="note-line">${esc(t('Rounded to whole sets. A set counts fully for its main muscle and partly for the ones that help, so the muscles add up to more than your work sets.'))}</div>`
 }
 
-function liftsHTML(R, unit, range, m) {
+function liftsHTML(R, unit, range, m, pictures = null) {
   const t0 = new Date(range.from + 'T00:00:00').getTime(), t1 = new Date(range.to + 'T23:59:59').getTime()
   return R.lifts.map((l, i) => {
     const e = { id: l.id }
@@ -437,7 +451,7 @@ function liftsHTML(R, unit, range, m) {
     const chart = l.points.length > 1
       ? lineChartSVG(l.points, { w: 330, h: 120, from: t0, to: t1, labels: [[t0, fmtDate(range.from)], [t1, fmtDate(range.to)]] })
       : `<p class="none small">${esc(t('One session in this period.'))} ${best}</p>`
-    return `<div class="lift keep">${m.s('lift' + i)}<div class="lift-h">${nameHTML(e)}<div class="lift-c">${[change, best].filter(Boolean).join(' · ')}</div></div>${chart}${m.e('lift' + i)}</div>`
+    return `<div class="lift keep">${m.s('lift' + i)}<div class="lift-h">${nameHTML(e, { short: true, pictures })}<div class="lift-c">${[change, best].filter(Boolean).join(' · ')}</div></div>${chart}${m.e('lift' + i)}</div>`
   })
 }
 
@@ -448,23 +462,23 @@ function headRow(title, cols, id, m, more = '') {
   return `<thead><tr><th colspan="${cols}" class="t-h">${m.h(id)}${esc(title)}</th></tr>${more}</thead>`
 }
 
-function prsHTML(R, unit, m) {
+function prsHTML(R, unit, m, pictures = null) {
   const rows = R.prs.map((p, i) => {
     const e = p.entry || { id: p.id }
     const set = p.best ? isoRun(`${fmtNum(p.best.w)} ${unit} × ${p.best.r}`) : (p.entry ? (p.entry.sets || []).filter(s => !isWarmupRow(s) && hasCompletedWork(s)).map(s => setLabel(p.id, s, p.entry.target)).slice(-1)[0] || '' : '')
-    return `<tr><td style="white-space:nowrap">${m.s('pr' + i)}${esc(listDate(p.d))}${m.e('pr' + i)}</td><td>${nameHTML(e)}</td><td class="num">${esc(set)}</td><td class="num">${p.best ? esc(fmtNum(p.best.est) + ' ' + unit) : '–'}</td></tr>`
+    return `<tr><td style="white-space:nowrap">${m.s('pr' + i)}${esc(listDate(p.d))}${m.e('pr' + i)}</td><td>${nameHTML(e, { short: true, pictures })}</td><td class="num">${esc(set)}</td><td class="num">${p.best ? esc(fmtNum(p.best.est) + ' ' + unit) : '–'}</td></tr>`
   }).join('')
   return `<table>${headRow(t('New bests'), 4, 'pr0', m, `<tr><th>${esc(t('Date'))}</th><th>${esc(t('Exercise'))}</th><th class="num">${esc(t('Best set'))}</th><th class="num">${esc(t('Est. 1RM'))}</th></tr>`)}<tbody>${rows}</tbody></table>`
 }
 
-function workoutListItem(S, w, unit, speedUnit, m, id, lead = '') {
+function workoutListItem(S, w, unit, speedUnit, m, id, lead = '', pictures = null) {
   const prs = new Set(w.prs || [])
   const ms = workoutDuration(w)
   const facts = [ms >= 60000 ? fmtDur(ms) : '', fmtVol(sessionVolume(w, S), unit), t('{0} sets', workSetsOf(w))].filter(Boolean).join(' · ')
   const rows = workoutUnits(w).flat().map((e, j) => {
     const sets = (e.sets || []).filter(s => !isWarmupRow(s) && hasCompletedWork(s)).map(s => setLabel(e.id, s, e.target, speedUnit))
     if (!sets.length) return ''
-    return `<tr><td class="n">${m.s(id + 'r' + j)}${nameHTML(e, { pr: prs.has(e.id), short: true })}</td><td class="s">${esc(sets.join(', '))}${m.e(id + 'r' + j)}</td></tr>`
+    return `<tr><td class="n">${m.s(id + 'r' + j)}${nameHTML(e, { pr: prs.has(e.id), short: true, pictures })}</td><td class="s">${esc(sets.join(', '))}${m.e(id + 'r' + j)}</td></tr>`
   }).join('')
   const note = w.note ? `<tr><td colspan="2" class="wk-note">${esc(w.note)}</td></tr>` : ''
   // One table per workout: it stays on one page when it fits; a workout longer than a page
@@ -482,7 +496,7 @@ function workoutListItem(S, w, unit, speedUnit, m, id, lead = '') {
  * calendar, muscles, estimated 1RM of the top lifts, body weight), and the lists (new bests,
  * every workout with its sets).
  */
-export function reportPrintHTML(S, { range = '4w', from, to, owner = '', probe = false, today, nutrition = null } = {}) {
+export function reportPrintHTML(S, { range = '4w', from, to, owner = '', probe = false, today, nutrition = null, pictures = null } = {}) {
   const m = probeMarks(probe)
   const unit = S.unit || 'kg'
   const speedUnit = speedUnitOf(S)
@@ -502,7 +516,7 @@ export function reportPrintHTML(S, { range = '4w', from, to, owner = '', probe =
     parts.push(`<div class="panel list">${musclesHTML(R, m)}</div>`)
     if (R.lifts.length) {
       // Two charts a row; the heading rides with the first row.
-      const blocks = liftsHTML(R, unit, r, m)
+      const blocks = liftsHTML(R, unit, r, m, pictures)
       parts.push(`<div class="keep panel">${m.s('lifts-h')}${m.h('lifts-h')}<h3 class="sec-h">${esc(t('Estimated 1RM, top lifts'))}</h3><div class="two">${blocks.slice(0, 2).join('')}</div>${m.e('lifts-h')}</div>`)
       if (blocks.length > 2) parts.push(`<div class="keep two" style="margin-top:8pt">${blocks.slice(2).join('')}</div>`)
     }
@@ -518,21 +532,46 @@ export function reportPrintHTML(S, { range = '4w', from, to, owner = '', probe =
   if (R.nutrition) parts.push(section('food', t('Nutrition'), nutritionHTML(R)))
   // A long list may run over a page: its rows never split and its header row repeats. The heading
   // stays with the first rows (break-after: avoid, and the probe checks it).
-  if (R.prs.length) parts.push(`<div class="panel list">${prsHTML(R, unit, m)}</div>`)
+  if (R.prs.length) parts.push(`<div class="panel list">${prsHTML(R, unit, m, pictures)}</div>`)
   if (R.workouts.length) {
     const lead = `<tr><th colspan="2" class="t-h">${m.h('T-wk0')}${esc(t('All workouts'))}</th></tr>`
-    R.workouts.forEach((w, i) => parts.push(workoutListItem(S, w, unit, speedUnit, m, 'wk' + i, i === 0 ? lead : '')))
+    R.workouts.forEach((w, i) => parts.push(workoutListItem(S, w, unit, speedUnit, m, 'wk' + i, i === 0 ? lead : '', pictures)))
   }
   const facts = [`${paperDate(r.from)} – ${paperDate(r.to)}`, tn('{0} workout', '{0} workouts', R.workouts.length)]
-  return printShell({ title: rangeTitle(r), kicker: t('Performance report'), facts, owner, date: today || todayISO(), body: parts.join(''), css: REPORT_CSS })
+  const usedIds = [
+    ...R.lifts.map(l => l.id),
+    ...R.prs.map(p => p.id),
+    ...R.workouts.flatMap(w => (w.entries || []).map(e => e.id)),
+  ]
+  const credit = usedPictureCredit(usedIds, pictures)
+  return printShell({ title: rangeTitle(r), kicker: t('Performance report'), facts, owner, date: today || todayISO(), body: parts.join(''), css: REPORT_CSS, credit })
+}
+
+/** Collect all unique exercise IDs appearing in a report range. */
+export function reportExerciseIds(S, opts) {
+  const R = reportData(S, opts)
+  const ids = new Set()
+  for (const l of R.lifts) if (l?.id) ids.add(l.id)
+  for (const p of R.prs) if (p?.id) ids.add(p.id)
+  for (const w of R.workouts) for (const e of w.entries || []) if (e?.id) ids.add(e.id)
+  return [...ids]
 }
 
 /** Print the report (see printDocument): the dialog on the web, the print sheet in the app. */
-export function printReport(S, opts) {
-  return printDocument(reportPrintHTML(S, opts), t('Performance report'))
+export async function printReport(S, { withPictures = true, loadPictures = loadPicturesForIds, ...opts } = {}) {
+  let pictures = null
+  if (withPictures) {
+    try { pictures = await loadPictures(S, reportExerciseIds(S, opts)) } catch { pictures = null }
+  }
+  return printDocument(reportPrintHTML(S, { ...opts, pictures }), t('Performance report'))
 }
 
 /** Print one finished workout. */
-export function printWorkout(S, w, opts) {
-  return printDocument(workoutPrintHTML(S, w, opts), w.name || t('Workout'))
+export async function printWorkout(S, w, { withPictures = true, loadPictures = loadPicturesForIds, ...opts } = {}) {
+  let pictures = null
+  if (withPictures) {
+    const ids = (w?.entries || []).map(e => e.id).filter(Boolean)
+    try { pictures = await loadPictures(S, ids) } catch { pictures = null }
+  }
+  return printDocument(workoutPrintHTML(S, w, { ...opts, pictures }), w.name || t('Workout'))
 }

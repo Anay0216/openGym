@@ -130,16 +130,28 @@ export function AssignSheet({ members, close, done }) {
 export function CommentSheet({ member, workout, close, done }) {
   const toast = useUI(s => s.toast)
   const [text, setText] = useState('')
+  const [stamp, setStamp] = useState('')
   const [busy, setBusy] = useState(false)
+  const parseStamp = s => {
+    const v = String(s || '').trim()
+    if (!v) return null
+    const mmss = v.match(/^(\d{1,3}):([0-5]?\d)$/)
+    if (mmss) return (+mmss[1]) * 60 + (+mmss[2])
+    const sec = Number(v)
+    return Number.isFinite(sec) && sec >= 0 ? Math.round(sec) : null
+  }
   const go = () => {
     setBusy(true)
-    commentOn(member.id, workout.id, text.trim()).then(() => { toast(t('Sent to {0}', member.name)); close(); done?.() })
+    const timestampSec = parseStamp(stamp)
+    commentOn(member.id, workout.id, text.trim(), { timestampSec }).then(() => { toast(t('Sent to {0}', member.name)); close(); done?.() })
       .catch(e => { setBusy(false); toast(trainerError(e)) })
   }
   return <>
     <h3>{t('Comment on {0}', workout.name || t('Workout'))}</h3>
     <p className="intg-lead">{fmtDate(workout.d)}. {t('{0} reads it in their inbox.', member.name)}</p>
     <TextArea rows={4} maxLength={1000} value={text} onChange={e => setText(e.target.value)} placeholder={t('Clean reps! Add 2.5 next time.')} aria-label={t('Comment')} autoFocus />
+    <div style={{ height: 8 }} />
+    <TextField value={stamp} onChange={e => setStamp(e.target.value)} placeholder={t('Video timestamp (e.g. 0:15, optional)')} aria-label={t('Video timestamp')} />
     <div style={{ height: 12 }} />
     <Button variant="primary" disabled={busy || !text.trim()} onClick={go}>{t('Send')}</Button>
   </>

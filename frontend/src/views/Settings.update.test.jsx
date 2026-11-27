@@ -198,13 +198,13 @@ describe('Settings → About: which APK this is', () => {
 // registered charity, so the Play build has no coffee links, only its own rating row.
 describe('Settings: support links', () => {
   const row = text => [...host.querySelectorAll('.lrow')].find(r => r.textContent.includes(text))
-  it('the APK keeps the donation links and has no Play rating row', async () => {
+  it('the APK has no upstream donation links and has no Play rating row', async () => {
     mocks.MOBILE = true
     mocks.android = true
     await mount()
-    expect(row('Buy me a coffee')).toBeTruthy()
-    expect(row('Ko-fi')).toBeTruthy()
-    expect(row('GitHub Sponsors')).toBeTruthy()
+    expect(row('Buy me a coffee')).toBeUndefined()
+    expect(row('Ko-fi')).toBeUndefined()
+    expect(row('GitHub Sponsors')).toBeUndefined()
     expect(row('Rate openGym on Google Play')).toBeUndefined()
   })
   it('the Google Play build shows only the rating row', async () => {
@@ -218,9 +218,9 @@ describe('Settings: support links', () => {
     expect(row('Rate openGym on Google Play')).toBeTruthy()
     expect(host.textContent).not.toContain('A coffee keeps it that way')
   })
-  it('the web keeps the donation links', async () => {
+  it('the web has no upstream donation links', async () => {
     await mount()
-    expect(row('Buy me a coffee')).toBeTruthy()
+    expect(row('Buy me a coffee')).toBeUndefined()
     expect(row('Rate openGym on Google Play')).toBeUndefined()
   })
 })

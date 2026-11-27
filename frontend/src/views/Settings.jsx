@@ -1321,20 +1321,12 @@ export default function Settings({ page = null, find = null, via = null, entryKe
           shows only its rating link: Play's payments policy wants Play billing for anything paid
           inside an app, donations to a project that isn't a registered charity included, so the
           coffee links stay on the APK, the iPhone and the web (docs/APP_STORES.md). */}
-      <Section title={t('Support openGym')} footer={play ? undefined : t('openGym is free: no ads, no subscriptions, no tracking. A coffee keeps it that way.')}>
+      {(MOBILE && ios || play) && <Section title={t('Support openGym')}>
         {MOBILE && ios && <Row icon="star" iconTint="var(--orange)" title={t('Rate openGym on the App Store')} accessory="chevron"
           onClick={() => window.open('https://apps.apple.com/app/id6822275400?action=write-review', '_blank', 'noopener')} />}
         {play && <Row icon="star" iconTint="var(--orange)" title={t('Rate openGym on Google Play')} accessory="chevron"
           onClick={() => window.open('https://play.google.com/store/apps/details?id=ch.duartesantos.opengym', '_blank', 'noopener')} />}
-        {!play && <>
-          <Row icon="heart" iconTint="var(--pink)" title={t('Buy me a coffee')} subtitle="Buy Me a Coffee" accessory="chevron"
-            onClick={() => window.open('https://buymeacoffee.com/duartesantos', '_blank', 'noopener')} />
-          <Row icon="heart" iconTint="var(--blue)" title="Ko-fi" accessory="chevron"
-            onClick={() => window.open('https://ko-fi.com/opengym', '_blank', 'noopener')} />
-          <Row icon="heart" iconTint="var(--purple)" title="GitHub Sponsors" accessory="chevron"
-            onClick={() => window.open('https://github.com/sponsors/DuarteSantos8', '_blank', 'noopener')} />
-        </>}
-      </Section>
+      </Section>}
       {/* "Add to Home screen": not inside the phone app, and not once it is installed. Safari's
           Share menu only on Apple (an iPad says Macintosh too); Windows and Linux get Chrome's
           install icon instead of an iPhone tip. */}
@@ -1348,11 +1340,11 @@ export default function Settings({ page = null, find = null, via = null, entryKe
           which build you are running, or whether an update actually installed. */}
       <div className="dim small sp-version">
         openGym v{__APP_VERSION__} · {t('free & open source (AGPL v3)')}<br />
-        <a href="https://github.com/DuarteSantos8/openGym" target="_blank" rel="noopener"><span>{t('Source code')}</span></a><br />
+        <a href="https://github.com/Anay0216/openGym" target="_blank" rel="noopener"><span>{t('Source code')}</span></a><br />
         {/* Attribution the media licence asks for word for word (agreement §8c), so it is not translated.
             The spans keep each link's words above its neighbours' 44 px tap targets (index.css). */}
         Exercise media © Aliaksandr Makatserchyk, <a href="https://gymvisual.com/" target="_blank" rel="noopener"><span>Gym visual</span></a>, gymvisual.com.
-        Media licensed for use in openGym only; see <a href="https://github.com/DuarteSantos8/openGym/blob/main/NOTICE.md" target="_blank" rel="noopener"><span>NOTICE.md</span></a>
+        Media licensed for use in openGym only; see <a href="https://github.com/Anay0216/openGym/blob/main/NOTICE.md" target="_blank" rel="noopener"><span>NOTICE.md</span></a>
       </div>
     </>,
 

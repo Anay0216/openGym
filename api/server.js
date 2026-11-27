@@ -34,6 +34,7 @@ import {
   createWatchCode, takeWatchCode, dropWatchCodes, createWatchLink, findWatchLink, touchWatchLink, listWatchLinks,
   dropWatchLinks, boxOf, putSnapshot, pushEvents, queuedEvents, ackEvents
 } from './watch-relay.js';
+import { createBuddyStore } from './buddy-session.js';
 import { startAdminSocket } from './admin-socket.js';
 import { createMediaStore, mediaLimits, mediaConfig, MediaError, HASH_RE } from './media.js';
 import { effectiveRoutineId } from './queue.js';
@@ -67,6 +68,7 @@ import { oidcRoutes } from './oidc/routes.js';
 
 const PORT = +(process.env.PORT || 3000);
 const DATA = process.env.DATA_DIR || '/data';
+const BUDDY = createBuddyStore();
 const RP_ID = process.env.RP_ID || 'localhost';
 const ORIGIN = process.env.ORIGIN || 'http://localhost:8080';
 const RP_NAME = process.env.RP_NAME || 'openGym';
@@ -2546,6 +2548,42 @@ const routes = {
   'GET /api/health': async (req, res) => {
     if (!dataWritable()) return json(res, 503, { ok: false, writable: false });
     json(res, 200, { ok: true, users: db.users.length, writable: true });
+  },
+
+  'POST /api/buddy/create': async (req, res) => {
+    const user = readSession(req);
+    if (!user) return json(res, 401, { error: 'not signed in' });
+    json(res, 200, { room: BUDDY.create(user) });
+  },
+  'POST /api/buddy/join': async (req, res) => {
+    const user = readSession(req);
+    if (!user) return json(res, 401, { error: 'not signed in' });
+    const body = await readBody(req);
+    const out = BUDDY.join(body.code, user);
+    if (out.error) return json(res, out.status || 400, { error: out.error });
+    json(res, 200, { room: out.room });
+  },
+  'GET /api/buddy/state': async (req, res) => {
+    const user = readSession(req);
+    if (!user) return json(res, 401, { error: 'not signed in' });
+    const code = query(req).get('code') || '';
+    const out = BUDDY.get(code, user.id);
+    if (out.error) return json(res, out.status || 400, { error: out.error });
+    json(res, 200, { room: out.room });
+  },
+  'POST /api/buddy/update': async (req, res) => {
+    const user = readSession(req);
+    if (!user) return json(res, 401, { error: 'not signed in' });
+    const body = await readBody(req);
+    const out = BUDDY.update(body.code, user.id, body);
+    if (out.error) return json(res, out.status || 400, { error: out.error });
+    json(res, 200, { room: out.room });
+  },
+  'POST /api/buddy/leave': async (req, res) => {
+    const user = readSession(req);
+    if (!user) return json(res, 401, { error: 'not signed in' });
+    const body = await readBody(req);
+    json(res, 200, BUDDY.leave(body.code, user.id));
   },
 
   // Public config the login screen needs before anyone is signed in. `coach` is absent unless

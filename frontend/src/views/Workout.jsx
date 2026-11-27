@@ -24,6 +24,7 @@ import { api, beacon } from '../lib/api.js'
 import { pyramidRestFor, maxRecordAt, isPyramid, pyramidLabel } from '../lib/pyramid.js'
 import { insertionIndexAfterCurrentUnit, nextUnfinishedUnit, setProgressHighWater, supersetFlowStep, restAfterSet, restOnRecheck, restSecFor, warmupRestSecFor, sideRestFor, ownSetRest, ownExerciseRest, stepUnitIndex, advanceAfterTimedRest, transitionRestFor, restKindAfter } from '../lib/supersetFlow.js'
 import Media from '../components/Media.jsx'
+import BuddyPanel from '../components/BuddyPanel.jsx'
 import WorkoutScrollAnchor from '../components/WorkoutScrollAnchor.jsx'
 import WorkoutChips from '../components/WorkoutChips.jsx'
 import { filmSetSheet, SetVideoBadge, ActiveSetVideo } from '../components/SetVideo.jsx'
@@ -128,6 +129,8 @@ function StartChooser() {
     <div style={{ height: 14 }} />
     <Button icon="shuffle" onClick={() => startFlow([])}>{t('Freestyle workout (pick as you go)')}</Button>
     {!S.routines.length && <><div style={{ height: 10 }} /><Button variant="primary" onClick={() => nav('/plan')}>{t('Build a plan first')}</Button></>}
+    <div style={{ height: 14 }} />
+    <BuddyPanel />
   </div>
 }
 
@@ -2925,6 +2928,12 @@ function ActiveWorkout() {
         {editing ? t('Save changes') : allDone ? t('Finish workout') : t('Finish workout early · {0} exercises', exDone + '/' + A.entries.length)}
       </button>
     })()}
+    <div style={{ height: 14 }} />
+    <BuddyPanel
+      exercise={A.entries[cur] ? exerciseNameText(EXIDX[A.entries[cur].id] || A.entries[cur]) : ''}
+      doneSets={A.entries.reduce((n, e) => n + (e.sets || []).filter(s => s.done).length, 0)}
+      totalSets={A.entries.reduce((n, e) => n + (e.sets || []).length, 0)}
+    />
     <div className="workout-end-spacer" />
   </WorkoutScrollAnchor>
 }

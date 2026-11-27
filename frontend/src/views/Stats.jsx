@@ -32,6 +32,7 @@ import { muscleTargetsSheet } from '../components/WeeklySets.jsx'
 import { TARGET_MUSCLES, targetOf, statusOf } from '../lib/muscle-targets.js'
 import { BarRow, StackBar, ChartLegend } from '../components/StatBars.jsx'
 import { StrengthLevelsCard } from '../components/StrengthLevel.jsx'
+import AnalyticsIntelligence from '../components/AnalyticsIntelligence.jsx'
 import BodyMap, { BodyMapLegend } from '../components/BodyMap.jsx'
 import { loadOfWeeklyPlan, loadOfWorkouts, muscleBalanceWindow, rankOf, MUSCLES, MUSCLE_NAME, musclesOf } from '../lib/muscles.js'
 import { fatigueOf, strengthOf, STRENGTH_FLOOR, LB_TO_KG } from '../lib/recovery.js'
@@ -1062,6 +1063,7 @@ export default function Stats() {
     {(workouts.length > 0 || Object.keys(loadOfWeeklyPlan(S)).length > 0) && <MusclesCard S={S} planFocus={planFocus} />}
     {/* Beginner to Elite for the main lifts (lib/strength-level.js); hidden without a weigh-in. */}
     {workouts.length > 0 && on('strength') && <StrengthLevelsCard S={S} />}
+    <AnalyticsIntelligence S={S} />
     {!effortOn && timeCard && <ExerciseTimeCard S={S} />}
     {!bodyOn && statsLinks}
     </section>

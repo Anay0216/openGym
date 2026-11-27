@@ -160,7 +160,7 @@ export function dashboardRoutes({ json, readBody, userById, audit, org, perms, l
       // What this person did here: their comments, suggestions and changes, as long as they still see the member.
       const inbox = log.inbox(member.id);
       const comments = acc.levels.workouts !== 'off' ? inbox.filter(i => i.kind === 'comment' && i.from?.id === user.id)
-        .map(i => ({ id: i.id, workoutId: i.workoutId, text: i.text, at: i.at, seen: !!i.seen })) : [];
+        .map(i => ({ id: i.id, workoutId: i.workoutId, text: i.text, at: i.at, seen: !!i.seen, ...(i.timestampSec != null ? { timestampSec: i.timestampSec } : {}), ...(i.exerciseId ? { exerciseId: i.exerciseId } : {}) })) : [];
       const suggestions = inbox.filter(i => i.kind === 'suggest' && i.from?.id === user.id).slice(-20)
         .map(i => ({ id: i.id, at: i.at, status: i.status, summary: i.summary, cats: i.cats }));
       const changes = log.undos(member.id).filter(u => u.by?.id === user.id && !u.accepted).slice(-20)
@@ -283,8 +283,16 @@ export function dashboardRoutes({ json, readBody, userById, audit, org, perms, l
       const S = state.read(member.id) || {};
       const w = (Array.isArray(S.workouts) ? S.workouts : []).find(x => x && String(x.id ?? `${x.d}|${x.start}`) === String(body.workoutId));
       if (!w) return json(res, 404, { error: 'no such workout', code: 'no-workout' });
+      const tsRaw = Number(body.timestampSec);
+      const timestampSec = Number.isFinite(tsRaw) && tsRaw >= 0 && tsRaw <= 36000 ? Math.round(tsRaw) : null;
+      const exerciseId = text(body.exerciseId, 80) || null;
       const by = actorOf(user, may.via);
-      const item = log.addInbox(member.id, { kind: 'comment', from: by, grantId: may.via, workoutId: String(body.workoutId), workout: { d: w.d, name: String(w.name || '').slice(0, 80) }, text: msg });
+      const item = log.addInbox(member.id, {
+        kind: 'comment', from: by, grantId: may.via, workoutId: String(body.workoutId),
+        workout: { d: w.d, name: String(w.name || '').slice(0, 80) }, text: msg,
+        ...(timestampSec != null ? { timestampSec } : {}),
+        ...(exerciseId ? { exerciseId } : {}),
+      });
       log.append(member.id, { ev: 'trainer.comment', actor: by, cat: 'workouts' });
       notify.push(member.id, 'comment', [user.name], msg);
       json(res, 200, { ok: true, id: item.id });

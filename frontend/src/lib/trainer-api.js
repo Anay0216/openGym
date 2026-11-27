@@ -21,7 +21,8 @@ export const photoBlob = (memberId, hash) => apiBlob('/api/trainer/member/photo?
 export const getMember = (id, before) => api('/api/trainer/member?' + q({ id, before, today: todayISO() }))
 export const sendOps = (memberId, ops, message) => post('/api/trainer/ops', { memberId, ops, message })
 export const assignRoutine = ({ memberIds, routineId, day, message }) => post('/api/trainer/assign', { memberIds, routineId, day, message })
-export const commentOn = (memberId, workoutId, text) => post('/api/trainer/comment', { memberId, workoutId, text })
+export const commentOn = (memberId, workoutId, text, { timestampSec, exerciseId } = {}) =>
+  post('/api/trainer/comment', { memberId, workoutId, text, ...(timestampSec != null ? { timestampSec } : {}), ...(exerciseId ? { exerciseId } : {}) })
 export const makeCode = ({ gymId, maxUses, days }) => post('/api/trainer/codes', { gymId, maxUses, days })
 export const revokeCode = id => post('/api/trainer/codes/revoke', { id })
 export const answerRequest = (id, accept) => post('/api/trainer/requests/answer', { id, accept })

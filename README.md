@@ -8,24 +8,15 @@
 </picture>
 </p>
 
-<a href="https://discord.gg/e62jY6fwVb"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2Fe62jY6fwVb%3Fwith_counts%3Dtrue&query=%24.approximate_member_count&suffix=%20members&label=Discord&logo=discord&logoColor=white&style=flat-square&labelColor=0c0e12&color=a3e635" alt="Discord"></a>
-<a href="https://github.com/DuarteSantos8/openGym/stargazers"><img src="https://img.shields.io/github/stars/DuarteSantos8/openGym?logo=github&logoColor=white&label=stars&style=flat-square&labelColor=0c0e12&color=a3e635" alt="Stars"></a>
-<a href="https://github.com/DuarteSantos8/openGym/releases"><img src="https://img.shields.io/github/v/release/DuarteSantos8/openGym?label=release&style=flat-square&labelColor=0c0e12&color=a3e635" alt="Release"></a>
-<a href="https://github.com/DuarteSantos8/openGym/releases"><img src="https://img.shields.io/github/downloads/DuarteSantos8/openGym/total?label=downloads&style=flat-square&labelColor=0c0e12&color=a3e635" alt="Downloads"></a>
-<a href="https://github.com/DuarteSantos8/openGym/actions/workflows/test.yml"><img src="https://img.shields.io/github/actions/workflow/status/DuarteSantos8/openGym/test.yml?branch=main&label=tests&style=flat-square&labelColor=0c0e12&color=a3e635" alt="Tests"></a>
+<a href="https://github.com/Anay0216/openGym/stargazers"><img src="https://img.shields.io/github/stars/Anay0216/openGym?logo=github&logoColor=white&label=stars&style=flat-square&labelColor=0c0e12&color=a3e635" alt="Stars"></a>
+<a href="https://github.com/Anay0216/openGym/releases"><img src="https://img.shields.io/github/v/release/Anay0216/openGym?label=release&style=flat-square&labelColor=0c0e12&color=a3e635" alt="Release"></a>
+<a href="https://github.com/Anay0216/openGym/actions/workflows/test.yml"><img src="https://img.shields.io/github/actions/workflow/status/Anay0216/openGym/test.yml?branch=main&label=tests&style=flat-square&labelColor=0c0e12&color=a3e635" alt="Tests"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-a3e635?style=flat-square&labelColor=0c0e12&color=a3e635" alt="AGPL-3.0"></a>
 
-<a href="https://apps.apple.com/app/id6822275400"><img src="website/app-store-badge.svg" alt="Download on the App Store" height="40"></a>
-<a href="https://github.com/DuarteSantos8/openGym/releases/latest"><img src="assets/readme/badge-android.svg" alt="Download the Android APK" height="40"></a>
+<a href="https://github.com/Anay0216/openGym/releases/latest"><img src="assets/readme/badge-android.svg" alt="Download the Android APK" height="40"></a>
 <a href="docs/SELF_HOSTING.md"><img src="assets/readme/badge-selfhost.svg" alt="Self-host with Docker" height="40"></a>
 
-<a href="https://trendshift.io/repositories/88268?utm_source=repository-badge&amp;utm_medium=badge&amp;utm_campaign=badge-repository-88268" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/88268" alt="DuarteSantos8%2FopenGym | Trendshift" width="250" height="55"/></a>
-<a href="https://trendshift.io/repositories/88268?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-88268" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/88268/weekly?language=JavaScript" alt="DuarteSantos8%2FopenGym | Trendshift" width="250" height="55"/></a>
-
-[Website](https://opengym.ch) · [Live demo](https://opengym.ch/demo/) · [Roadmap](ROADMAP.md) · [Changelog](CHANGELOG.md)
-
-<a href="https://buymeacoffee.com/duartesantos"><img src="assets/readme/badge-coffee.svg" alt="Buy me a coffee" height="40"></a>
-<a href="https://ko-fi.com/opengym"><img src="assets/readme/badge-kofi.svg" alt="Support openGym on Ko-fi" height="40"></a>
+[Roadmap](ROADMAP.md) · [Changelog](CHANGELOG.md)
 
 </div>
 
@@ -147,7 +138,7 @@ The full list of what changed release by release is in the [changelog](CHANGELOG
 You need [Docker](https://docs.docker.com/get-docker/) with Compose.
 
 ```bash
-git clone https://github.com/DuarteSantos8/openGym
+git clone https://github.com/Anay0216/openGym
 cd openGym
 cp .env.example .env
 docker compose pull      # prebuilt images, amd64 + arm64 (skip this to build from source)
@@ -311,73 +302,13 @@ plan is in [ROADMAP.md](ROADMAP.md), and the issues sit in the
 
 ## Community
 
-- **[Discord](https://discord.gg/e62jY6fwVb)** for release announcements, self-hosting help and
-  quick back-and-forth. Usually the fastest way to get an answer.
-- **[Discussions](https://github.com/DuarteSantos8/openGym/discussions)** for questions and ideas
+- **[Discussions](https://github.com/Anay0216/openGym/discussions)** for questions and ideas
   you want the next person to find by searching.
-- **[Issues](https://github.com/DuarteSantos8/openGym/issues)** for reproducible bugs and agreed-on
+- **[Issues](https://github.com/Anay0216/openGym/issues)** for reproducible bugs and agreed-on
   work. Login trouble is almost always an `RP_ID`/`ORIGIN` mismatch; the
   [self-hosting guide](docs/SELF_HOSTING.md) covers it.
-- **[Pull requests](https://github.com/DuarteSantos8/openGym/pulls)** are welcome; start with
+- **[Pull requests](https://github.com/Anay0216/openGym/pulls)** are welcome; start with
   [CONTRIBUTING.md](CONTRIBUTING.md).
-
-<a href="https://github.com/DuarteSantos8/openGym/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=DuarteSantos8/openGym&max=60" alt="Contributors">
-</a>
-
-### Where the code lives
-
-GitHub is the home of the project. [gitlab.com/DuarteSantos8/opengym](https://gitlab.com/DuarteSantos8/opengym)
-is a mirror, updated by a GitHub Actions workflow on every push to `main` and every release tag. It
-exists because its CI builds the multi-arch images and the SBOMs for its registry (the APKs are
-built and signed on the release machine and attached to the GitHub release). Nothing is merged there by hand. In the changelog, `!NN` refers to a GitLab merge request
-from the weeks in August and September 2026 when the project lived there.
-
-## How openGym is built
-
-People have asked about this, so plainly: **openGym is developed with
-[Claude Code](https://claude.com/claude-code)**, Anthropic's coding agent. A large share of the
-code, tests and documentation is drafted in Claude Code sessions, and the repository carries a
-[`CLAUDE.md`](CLAUDE.md) with the project context those sessions start from.
-
-What that does and doesn't mean:
-
-- **A person decides and ships.** What goes in, what gets reviewed and merged, and every release
-  are the maintainer's call. Changes are tested on a staging instance and on real phones before
-  they are tagged.
-- **Tests hold the logic in place.** The training logic is covered by unit tests, and pull requests
-  run the frontend, API and MCP suites in CI. That is the guard against plausible-looking code
-  that is wrong, whoever or whatever wrote it.
-- **The app itself doesn't need an LLM.** Nothing in a default install calls an AI service. The AI
-  coach and the MCP server are opt-in, and the coach only talks to the provider you configure, with
-  your own key.
-
-Community pull requests are written by their authors, with whatever tools they like, and reviewed
-the same way.
-
-## Sponsors
-
-**[ElfHosted](https://store.elfhosted.com/product/opengym/?utm_source=opengym&utm_medium=github&utm_campaign=opengym-sponsor)** sponsors openGym. If you'd rather not run a server, ElfHosted
-runs your own private openGym for you, and your data stays yours. There's no Docker or HTTPS to set up, the AI coach is included with no API key needed, and updates and daily backups are handled for you. Try it with a $1, 7-day trial.
-
-Sponsoring keeps the lights on. It buys no say in what openGym does: nothing is held back for
-sponsors, and nothing ever will be.
-
-## Support
-
-openGym is free and stays free: AGPL, no paid tier, nothing held back for sponsors. If it replaced a
-paid tracker for you and you'd like to chip in, there's Buy Me a Coffee, Ko-fi and GitHub Sponsors
-(the app has the same three under Settings → About & updates, and on the iPhone a shortcut to
-leaving an App Store review). A star, a bug report or a pull request helps just as much.
-
-<a href="https://buymeacoffee.com/duartesantos" target="_blank">
-  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="60" width="217">
-</a>
-<a href="https://ko-fi.com/opengym" target="_blank"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support openGym on Ko-fi" height="60"></a>
-
-[GitHub Sponsors](https://github.com/sponsors/DuarteSantos8)
-
-[![Star History Chart](https://api.star-history.com/svg?repos=duartesantos8/opengym&type=Date)](https://star-history.com/#DuarteSantos8/openGym&Date)
 
 ## License
 

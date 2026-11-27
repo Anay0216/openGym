@@ -115,7 +115,7 @@ function WorkoutCard({ w, d, comments, onComment, onEdit }) {
       </div> })}
       {w.note && <p className="tr-note">{w.note}</p>}
     </div>}
-    {mine.map(c => <div key={c.id} className="tr-comment"><Icon name="chat" /><span>{c.text}</span><span className="tr-tile-s">{c.seen ? t('Seen') : t('Sent')}</span></div>)}
+    {mine.map(c => <div key={c.id} className="tr-comment"><Icon name="chat" /><span>{c.timestampSec != null ? <b style={{ marginInlineEnd: 6 }}>@{Math.floor(c.timestampSec / 60)}:{String(c.timestampSec % 60).padStart(2, '0')}</b> : null}{c.text}</span><span className="tr-tile-s">{c.seen ? t('Seen') : t('Sent')}</span></div>)}
     {w._by && <div className="tr-by">{t('Logged by {0}', w._by.name)}</div>}
     {w._edit && <div className="tr-by">{t('Corrected by {0}', w._edit.name)}</div>}
     {(onComment || onEdit) && <div className="tr-wo-a">

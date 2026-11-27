@@ -5983,6 +5983,42 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
 
+  /api/buddy/create:
+    post:
+      summary: Create a live Gym Buddy co-op session room
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200':
+          description: Room created
+  /api/buddy/join:
+    post:
+      summary: Join a live Gym Buddy co-op session room
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200':
+          description: Joined room
+  /api/buddy/state:
+    get:
+      summary: Fetch current Gym Buddy co-op session state
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200':
+          description: Room state
+  /api/buddy/update:
+    post:
+      summary: Update caller status in a Gym Buddy co-op session
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200':
+          description: Room updated
+  /api/buddy/leave:
+    post:
+      summary: Leave a Gym Buddy co-op session
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200':
+          description: Left room
+
 components:
   securitySchemes:
     cookieAuth:

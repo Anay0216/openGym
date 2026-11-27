@@ -126,12 +126,13 @@ async function loadOne(src, { fetchImpl, store, decode }) {
  *  - `placeholder` a grey square for every exercise with a picture (layout checks, tests)
  *  - `fetchImpl`, `store`, `decode` for tests
  */
-export async function loadPrintPictures(S, {
-  routineId, placeholder = false, timeoutMs = PRINT_PICTURES_TIMEOUT_MS,
+export async function loadPicturesForIds(S, ids, {
+  placeholder = false, timeoutMs = PRINT_PICTURES_TIMEOUT_MS,
   fetchImpl = globalThis.fetch, store, decode = decodedSize, index = EXIDX,
 } = {}) {
   const out = {}
-  const jobs = printedExerciseIds(S, routineId)
+  const uniqueIds = [...new Set((ids || []).filter(Boolean))]
+  const jobs = uniqueIds
     .map(id => [id, printPictureSource(S, id, index)])
     .filter(([, src]) => src)
   if (placeholder) {
@@ -160,6 +161,15 @@ export async function loadPrintPictures(S, {
   clearTimeout(timer)
   done = true
   return { ...out }
+}
+
+export async function loadPrintPictures(S, {
+  routineId, placeholder = false, timeoutMs = PRINT_PICTURES_TIMEOUT_MS,
+  fetchImpl = globalThis.fetch, store, decode = decodedSize, index = EXIDX,
+} = {}) {
+  return loadPicturesForIds(S, printedExerciseIds(S, routineId), {
+    placeholder, timeoutMs, fetchImpl, store, decode, index,
+  })
 }
 
 /* ---------------------------------------------------------------- the switch, per device */
